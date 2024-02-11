@@ -94,8 +94,10 @@ def CDF(hist_img,img,bin_centers):
     cdf=np.round(
         ((cum_sum-np.min(cum_sum))/(total_pixels-np.min(cum_sum)))*255
     ).astype(int)
+    print(cdf)
     out = np.interp(img.flatten(), bin_centers, cdf).astype(int)
     out = out.reshape(img.shape)
+    return out 
 
 
 
@@ -109,11 +111,10 @@ path = "vallee.png"
 img = cv.imread(path)
 img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 hist,bins = np.histogram(img.flatten(),256,[0,256])
-
 bins=np.array(bins[:256])
 
 #plt.imshow(QDHE(hist,img,6000,bin_centers=bins),cmap="Greys_r")
-plt.imshow(CDF(hist,img,bin_centers=bins))
+plt.imshow(CDF(hist,img,bin_centers=bins),cmap="Greys_r")
 plt.show()
-seperations,_,_=segment_histogram(hist,img.shape[0],img.shape[1])
-plot_histogram_with_separation(hist, seperations)
+#seperations,_,_=segment_histogram(hist,img.shape[0],img.shape[1])
+#plot_histogram_with_separation(hist, seperations)
