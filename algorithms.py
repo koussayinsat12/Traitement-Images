@@ -8,6 +8,8 @@ from skimage import exposure
 import skimage.morphology as morp 
 from skimage.filters import rank 
 from skimage.io import imsave, imread
+
+#plot
 def plot_histogram_with_separation(image_histogram, separating_points):
     plt.figure(figsize=(8, 4))  # Set the figure size
     plt.bar(range(len(image_histogram)), image_histogram, color='skyblue') 
@@ -56,7 +58,7 @@ def segment_histogram(image_histogram, width, height):
     pixels_m = [0, pixels_m1, pixels_m2, pixels_m3, total_pixels]
     return separating_points, sub_histograms, pixels_m
 
-def preprocess_histogram(image_histogram,img,Tc,bin_centers):
+def QDHE(image_histogram,img,Tc,bin_centers):
     height=img.shape[0]
     width=img.shape[1]
     separating_points, sub_histograms, pixels_m = segment_histogram(image_histogram=image_histogram, width=width, height=height)
@@ -64,6 +66,7 @@ def preprocess_histogram(image_histogram,img,Tc,bin_centers):
     total_span = np.sum(pixels_m)
     new_hist = []
     for i, sub_histogram in enumerate(sub_histograms):
+        sub_histogram=clip_histogram(sub_histogram,Tc)
         min_val = separating_points[i]
         max_val = separating_points[i+1]
         span = abs(int(i/4 * total_pixels) - int((i+1)/4 * total_pixels))
@@ -73,7 +76,7 @@ def preprocess_histogram(image_histogram,img,Tc,bin_centers):
         new_min = max_val + 1
         new_max = new_min + range_val
         
-        sub_histogram = np.round((np.cumsum(sub_histogram) / total_pixels) * (new_max - new_min)) + new_min
+        sub_histogram = np.round((np.cumsum(sub_histogram)/total_pixels) * (new_max - new_min)) + new_min
         
         new_hist.extend(sub_histogram.astype(int))
     cdf=np.array(new_hist)
@@ -85,8 +88,14 @@ def preprocess_histogram(image_histogram,img,Tc,bin_centers):
     return out
 
     
-
-
+def CDF(hist_img,img,bin_centers):
+    total_pixels=img.shape[0]*img.shape[1]
+    cum_sum=hist_img.cumsum()
+    cdf=np.round(
+        ((cum_sum-np.min(cum_sum))/(total_pixels-np.min(cum_sum)))*255
+    ).astype(int)
+    out = np.interp(img.flatten(), bin_centers, cdf).astype(int)
+    out = out.reshape(img.shape)
 
 
 
@@ -103,7 +112,8 @@ hist,bins = np.histogram(img.flatten(),256,[0,256])
 
 bins=np.array(bins[:256])
 
-plt.imshow(preprocess_histogram(hist,img,10,bin_centers=bins),cmap="Greys_r")
+#plt.imshow(QDHE(hist,img,6000,bin_centers=bins),cmap="Greys_r")
+plt.imshow(CDF(hist,img,bin_centers=bins))
 plt.show()
 seperations,_,_=segment_histogram(hist,img.shape[0],img.shape[1])
-#plot_histogram_with_separation(hist, seperations)
+plot_histogram_with_separation(hist, seperations)
