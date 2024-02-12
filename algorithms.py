@@ -88,7 +88,7 @@ def QDHE(image_histogram,img,Tc,bin_centers):
     return out
 
     
-def CDF(hist_img,img,bin_centers):
+def CHE(hist_img,img,bin_centers):
     total_pixels=img.shape[0]*img.shape[1]
     cum_sum=hist_img.cumsum()
     cdf=np.round(
@@ -114,7 +114,7 @@ hist,bins = np.histogram(img.flatten(),256,[0,256])
 bins=np.array(bins[:256])
 
 #plt.imshow(QDHE(hist,img,6000,bin_centers=bins),cmap="Greys_r")
-plt.imshow(CDF(hist,img,bin_centers=bins),cmap="Greys_r")
-plt.show()
+#plt.imshow(CHE(hist,img,bin_centers=bins),cmap="Greys_r")
+#plt.show()
 #seperations,_,_=segment_histogram(hist,img.shape[0],img.shape[1])
 #plot_histogram_with_separation(hist, seperations)
