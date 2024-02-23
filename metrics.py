@@ -21,12 +21,7 @@ class Metrics():
             for j in range(width):
                 cum_sum=cum_sum+np.square(self.new_img[i,j]-X)
         return np.sqrt((1/((width*height)-1))*cum_sum)
-path = "vallee.png"
-img = cv.imread(path)
-img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-metrics=Metrics(img=img,new_img=img)
-print(metrics.PSNR())
-print(metrics.SD())
+
 
                 
                 
